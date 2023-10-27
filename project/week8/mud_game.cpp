@@ -2,8 +2,7 @@
 #include <string>
 using namespace std;
 
-// 현재는 아이템, 적, 포션이 사라지는 버전.
-// 뒤에 사라지지 않도록 조정할 예정.
+// 현재는 아이템과 적이 사라지지 않도록 조정 완료.
 
 
 // 상수 선언
@@ -12,15 +11,15 @@ const int mapY = 5;
 const int default_health = 20;
 
 // 변수 선언
-bool ongoing = true;
-bool debug_mod = false;
-int health = default_health;
+bool ongoing = true; // 이 bool은 게임이 진행중인지 여부를 확인. 기본값 true.
+bool debug_mod = false; // 이 bool은 디버그 모드 상태를 확인. 기본값 false.
+int health = default_health; // 현재 체력 설정.
 
 // 사용자 정의 함수
 bool checkXY(int user_x, int mapX, int user_y, int mapY);
 void displayMap(int map[][mapX], int user_x, int user_y);
 bool checkGoal(int map[][mapX], int user_x, int user_y);
-int checkObject(int map[][mapX], int user_x, int user_y, int& health);
+void checkState(int map[][mapX], int user_x, int user_y, int& health);
 void debugMod(int map[][mapX], int user_x, int user_y);
 void healthCare(int& health);
 
@@ -65,7 +64,7 @@ int main() {
 			else {
 				cout << "위로 한 칸 올라갑니다." << endl;
 				displayMap(map, user_x, user_y);
-				map[user_y][user_x] = checkObject(map, user_x, user_y, health);
+				checkState(map, user_x, user_y, health);
 				health -= 1;
 			}
 		}
@@ -80,7 +79,7 @@ int main() {
 			else {
 				cout << "위로 한 칸 내려갑니다." << endl;
 				displayMap(map, user_x, user_y);
-				map[user_y][user_x] = checkObject(map, user_x, user_y, health);
+				checkState(map, user_x, user_y, health);
 				health -= 1;
 			}
 		}
@@ -96,7 +95,7 @@ int main() {
 			else {
 				cout << "왼쪽으로 이동합니다." << endl;
 				displayMap(map, user_x, user_y);
-				map[user_y][user_x] = checkObject(map, user_x, user_y, health);
+				checkState(map, user_x, user_y, health);
 				health -= 1;
 			}
 		}
@@ -111,7 +110,7 @@ int main() {
 			else {
 				cout << "오른쪽으로 이동합니다." << endl;
 				displayMap(map, user_x, user_y);
-				map[user_y][user_x] = checkObject(map, user_x, user_y, health);
+				checkState(map, user_x, user_y, health);
 				health -= 1;
 			}
 		}
@@ -145,7 +144,7 @@ int main() {
 			cout << "게임을 종료합니다." << endl;
 			break;
 		}
-		healthCare(health);
+		healthCare(health); // 헬스케어 부분은 체력이 0으로 떨어졌는지 확인하기 위한 목적.
 	}
 	return 0;
 
@@ -203,38 +202,30 @@ bool checkGoal(int map[][mapX], int user_x, int user_y) {
 	return false;
 }
 
-// 오브젝트를 만날 시
-int checkObject(int map[][mapX], int user_x, int user_y, int& health)
+// 오브젝트를 만났는지 여부를 checkState호출로 구현.
+// 요구 기능에 따라 오브젝트 제거 기능 삭제. 따라서 int에서 void로 함수를 바꾸었음.
+void checkState(int map[][mapX], int user_x, int user_y, int& health)
 {
-	// 아이템 먹으면
+	// 아이템 먹으면 반응
 	if (map[user_y][user_x] == 1)
 	{
-		int del = 0;
 		cout << "아이템을 먹었습니다." << endl;
-		return del;
 	}
 	// 적과 마주치면 HP -2
 	else if (map[user_y][user_x] == 2)
 	{
-		int del = 0;
 		cout << "적과 마주쳤습니다." << endl;
 		cout << "체력을 2만큼 잃습니다." << endl;
 		health -= 2;
-		return del;
 	}
-	// 포션을 먹으면 HP +5
+	// 포션을 먹으면 HP +2
 	else if (map[user_y][user_x] == 3)
 	{
-		int del = 0;
-		cout << "포션을 먹고 체력을 5만큼 회복합니다." << endl;
-		health += 5;
-		return del;
+		cout << "포션을 먹고 체력을 2만큼 회복합니다." << endl;
+		health += 2;
 	}
-	// 이외 경우 0 반환. 해당 부분이 없으면 쓰레기값 반환으로 오류 발생.
 	else
 	{
-		int del = 0;
-		return del;
 	}
 }
 
